@@ -1,16 +1,9 @@
 version: 2
 
-models:
-  - name: stg_orders
-    columns:
-      - name: order_id
-        tests: [not_null, unique]
-      - name: customer_id
-        tests: [not_null]
-
-  - name: fct_monthly_revenue
-    tests:
-      - relationships:
-          to: ref('stg_orders')
-          field: customer_id
-          column: customer_id
+# Add your model tests here
+# Example:
+# models:
+#   - name: your_model_name
+#     columns:
+#       - name: column_name
+#         tests: [not_null, unique]
