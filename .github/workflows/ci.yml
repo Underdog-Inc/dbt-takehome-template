@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Create cache key from pyproject.toml
+        id: cache-key
+        run: echo "key=$(sha256sum pyproject.toml | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-uv-${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Install dependencies with uv
+        run: uv sync
+
+      - name: Set up dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cp profiles/profiles.example.yml ~/.dbt/profiles.yml
+
+      - name: Install dbt packages
+        run: uv run dbt deps
+
+      - name: Run dbt build
+        run: uv run dbt build --target dev
+
+      - name: Generate dbt docs
+        if: always()
+        run: uv run dbt docs generate --target dev
+
+      - name: Upload dbt logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-logs
+          path: logs/
+          retention-days: 7
+
+      - name: Upload dbt target artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-target
+          path: target/
+          retention-days: 7
+
+      - name: Upload dbt database
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-database
+          path: .dbt/dbt_duckdb.duckdb
+          retention-days: 7
+          if-no-files-found: warn
