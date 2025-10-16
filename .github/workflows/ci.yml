@@ -52,6 +52,9 @@ jobs:
       - name: Install dbt packages
         run: uv run dbt deps
 
+      - name: Create .dbt directory for DuckDB
+        run: mkdir -p .dbt
+
       - name: Run dbt build
         run: uv run dbt build --target dev
 
