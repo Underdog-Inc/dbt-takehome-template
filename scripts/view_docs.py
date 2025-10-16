@@ -35,14 +35,17 @@ import shutil
 def check_gh_cli():
     """Check if GitHub CLI is installed and authenticated."""
     try:
-        subprocess.run(
+        result = subprocess.run(
             ["gh", "auth", "status"],
-            check=True,
             capture_output=True,
             text=True
         )
-        return True
-    except subprocess.CalledProcessError:
+        # gh auth status returns non-zero if ANY account has issues,
+        # but we just need at least one working account.
+        # Check if there's a "Logged in" message in the output
+        output = result.stdout + result.stderr
+        if "Logged in" in output or "✓" in output:
+            return True
         print("❌ GitHub CLI is not authenticated. Please run: gh auth login")
         return False
     except FileNotFoundError:
