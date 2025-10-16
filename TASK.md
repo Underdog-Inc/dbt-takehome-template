@@ -90,7 +90,7 @@ Aim for **2–3 hours**. If you decide not to implement something, explain the t
 
 ## Submission
 Open an Issue titled `Submission: <Your Name>` and include:
-- Repo URL (grant access to reviewers: `@eamon-glackin` and team)
+- Repo URL (grant access to reviewers: `@eamon-underdog`| eamon.glackin@underdogfantasy.com and team)
 - Approx. time spent
 - Assumptions & edge cases
 - Any deviations from requirements with rationale
