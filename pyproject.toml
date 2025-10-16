@@ -1,0 +1,21 @@
+[project]
+name = "dbt-takehome"
+version = "0.1.0"
+description = "Self-contained dbt take-home using DuckDB"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+  "dbt-core>=1.7,<2.0",
+  "dbt-duckdb>=1.7,<2.0",
+  "sqlfluff>=3.0.0",
+  "sqlfluff-templater-dbt>=3.0.0",
+]
+
+[tool.uv]
+# Use the local .venv by default when running `uv run`
+package = true
+
+[tool.sqlfluff]
+dialect = "postgres"
+templater = "dbt"
+exclude_rules = ["L031", "L034"]

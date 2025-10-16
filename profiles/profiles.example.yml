@@ -1,0 +1,8 @@
+dbt-takehome:
+  outputs:
+    dev:
+      type: duckdb
+      path: "./.dbt/dbt_duckdb.duckdb"
+      schema: main
+      threads: 4
+  target: dev

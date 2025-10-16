@@ -1,0 +1,107 @@
+# TASK — Analytics Engineer dbt Take‑Home
+
+## Scenario
+You're joining the analytics engineering team at Underdog Fantasy, a daily fantasy sports platform. You will model core business entities from the provided raw CSVs — users, contests, entries, and financial transactions — then surface key metrics and insights for analysis.
+
+## Data
+You have five CSV seeds (`seeds/`):
+- **users.csv** — one row per user (user_id, created_at, state, signup_channel, kyc_status, …)
+- **contests.csv** — one row per fantasy contest (contest_id, contest_type, entry_fee, start_time, status, max_entries, …)
+- **entries.csv** — one row per user entry into a contest (entry_id, user_id, contest_id, entry_time, entry_fee, payout_amount, bonus_funds_used, cash_used, …)
+- **deposits.csv** — one row per user deposit (deposit_id, user_id, deposit_ts, amount, payment_method, status, is_admin_deposit)
+- **withdrawals.csv** — one row per user withdrawal (withdrawal_id, user_id, withdrawal_ts, amount, status)
+
+Assume:
+- Contests in `status IN ('completed', 'cancelled')` are final
+- Entries are linked to completed contests for payout calculations
+- Financial transactions in `status = 'completed'` are settled
+- All amounts are in USD
+- **Bonus funds**: Admin deposits (`is_admin_deposit = TRUE`) credit promotional funds to users. When entering contests, bonus funds are consumed first before user cash. **Only cash entry fees (`cash_used`) count toward net gaming revenue**, not total `entry_fee`.
+- **Data quality**: Some records may have NULLs or missing values that need cleaning in staging.
+
+> Data volume includes thousands of records to simulate realistic scenarios. See `seeds/DATA_SUMMARY.md` for detailed information.
+
+## Key Business Concepts
+
+### Bonus Funds vs Cash Revenue
+This is a critical distinction in fantasy sports platforms:
+- Admin deposits are **promotional bonuses** that don't represent real user deposits
+- Users spend bonus funds before their cash when entering contests
+- **Net gaming revenue = cash entry fees - payouts** (excludes bonus funds)
+- Bonus deposits should NOT be counted as user cash deposits
+
+### Entry Economics
+- Total `entry_fee` = `bonus_funds_used` + `cash_used`
+- Winners receive `payout_amount` based on contest performance
+- Cancelled contests refund the full `entry_fee` as `payout_amount`
+
+### Data Quality
+The dataset intentionally includes ~1-2% records with missing/NULL values to test your staging layer handling.
+
+## Requirements
+1. **Modeling**
+   - Create **staging** models that clean and type‑cast the seeds. Handle NULLs, missing values, and data quality issues. See `models/staging/stg_entries_example.sql` for a reference pattern.
+   - Build a **user-level marts model** at a time grain of your choice (daily, weekly, or monthly) with key metrics per user:
+     - Total cash entry fees paid (`cash_used`)
+     - Total bonus entry fees used (`bonus_funds_used`)
+     - Total payouts won
+     - Net gaming revenue (cash entry fees - payouts)
+     - User cash deposits (excluding admin/bonus deposits)
+     - Withdrawals
+     - Net balance change
+   - **Choose 2-3 additional mart models** from these suggestions or propose your own:
+     - `fct_contests` — Contest-level metrics: fill rate (entries/max_entries), total revenue, margin, payout efficiency
+     - `fct_deposits_overview` — Deposit success rates by payment method, average amounts, admin vs user deposits
+     - `fct_withdrawals_overview` — Withdrawal completion rates, failure analysis
+     - **Top 10 states by net gaming revenue** with tie‑breakers (document your rule).
+   - Implement an **incremental** strategy for at least one marts model (idempotent). Document your choice of unique key, time grain, and strategy.
+   - **Bonus:** Build a weekly grain model with weeks starting on Tuesday to align with the NFL calendar. Consider creating a macro for this date logic.
+2. **Testing**
+   - Add **column tests** (e.g., `unique`, `not_null`) for key fields.
+   - Add **relationship tests** between marts and staging (e.g., `user_id` relationships).
+   - Add a **custom test** to validate business logic (e.g., bonus_funds_used ≤ entry_fee, total payouts ≤ prize pool).
+   - Add tests to catch data quality issues (e.g., accepted values for status fields).
+3. **Documentation**
+   - Add descriptions in `schema.yml` and a short `README.md` in `models/staging/` explaining your staging conventions.
+4. **Macro**
+   - Implement at least **one reusable macro** and use it in your models. Examples: safe type casting, date calculations, or custom business logic.
+5. **Docs**
+   - Ensure `dbt build` generates a docs site. We'll review lineage.
+
+## Deliverables
+- Models in `models/staging/` and `models/marts/`
+- Tests in `models/tests/` or in model YAML
+- Macro(s) in `macros/`
+- Documentation (model/column descriptions)
+- Incremental config on at least one marts model
+- All CI checks (if configured) passing
+
+## Timebox
+Aim for **2–3 hours**. If you decide not to implement something, explain the trade‑off in your repo README or in comments.
+
+## Tips for Success
+- Read `seeds/DATA_SUMMARY.md` to understand the bonus funds logic
+- Remember: `cash_used` ≠ `entry_fee` (this matters for revenue!)
+- Handle data quality issues in staging (use COALESCE, NULLIF, etc.)
+- Filter to `status = 'completed'` for financial calculations
+- Separate admin deposits from user deposits
+- Document your time grain choice and incremental strategy rationale
+- Test for both data quality and business logic
+
+## Submission
+Open an Issue titled `Submission: <Your Name>` and include:
+- Repo URL (grant access to reviewers: `@eamon-glackin` and team)
+- Approx. time spent
+- Assumptions & edge cases
+- Any deviations from requirements with rationale
+
+## Rubric (what we look for)
+- **Modeling & structure (30%)** — staging vs marts separation, naming, clarity, handling nuanced busienss context correctly
+- **Testing (15%)** — appropriate tests and coverage, data quality tests
+- **Documentation (10%)** — useful descriptions and READMEs
+- **Incremental strategy (5%)** — correctness, idempotence, grain choice & rationale
+- **SQL quality (10%)** — readability, maintainability, macro use
+- **Execution (15%)** — commit hygiene, reproducible build, docs, handling data quality issues
+- **Polish / Bonus (15%)** — thoughtful macros, weekly NFL-aligned model, additional mart models (contests/deposits/withdrawals), semantic layering
+
+> It's okay to leave notes on "what I'd do next in production."

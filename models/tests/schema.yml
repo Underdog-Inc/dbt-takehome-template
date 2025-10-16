@@ -1,0 +1,9 @@
+version: 2
+
+# Add your model tests here
+# Example:
+# models:
+#   - name: your_model_name
+#     columns:
+#       - name: column_name
+#         tests: [not_null, unique]
