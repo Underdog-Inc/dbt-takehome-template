@@ -253,3 +253,107 @@ When reviewing, ensure:
 8. [ ] Documentation exists
 9. [ ] Can answer: "Why did you choose this time grain?"
 10. [ ] Can answer: "How did you handle bonus funds in revenue?"
+
+---
+
+## 📊 Viewing Candidate's dbt Docs from CI
+
+When a candidate submits their work via Pull Request, the CI pipeline automatically generates dbt documentation and uploads it as a GitHub Actions artifact. You can view these docs without running the project locally.
+
+### Prerequisites
+- [GitHub CLI](https://cli.github.com/) installed and authenticated
+  ```bash
+  # Install GitHub CLI (if not already installed)
+  brew install gh  # macOS
+  
+  # Authenticate
+  gh auth login
+  ```
+
+### Quick Start - Automated Script
+
+Use the provided script to automatically download and view docs:
+
+```bash
+# View docs from a specific PR (finds latest workflow run automatically)
+python scripts/view_docs.py <PR_NUMBER>
+
+# Example: View docs from PR #5
+python scripts/view_docs.py 5
+
+# View docs from a specific workflow run ID
+python scripts/view_docs.py <RUN_ID> --run-id
+
+# Use a different port if 8080 is in use
+python scripts/view_docs.py 5 --port 8081
+
+# Don't auto-open browser (just download and extract)
+python scripts/view_docs.py 5 --no-browser
+```
+
+**What the script does:**
+1. 📥 Downloads the `dbt-target` artifact from the PR's latest successful workflow run
+2. 📂 Extracts it to a temporary directory
+3. 🌐 Starts a local HTTP server on port 8080
+4. 🚀 Automatically opens the docs in your default browser
+5. 🧹 Cleans up temporary files when you stop the server (Ctrl+C)
+
+### Manual Method (Alternative)
+
+If you prefer to download manually or the script isn't working:
+
+1. **Navigate to the PR on GitHub**
+   - Go to the candidate's PR page
+   - Click on the "Checks" tab or scroll to the workflow runs
+
+2. **Find the latest workflow run**
+   - Look for a successful (green checkmark) CI workflow run
+   - Click on it to view details
+
+3. **Download the artifact**
+   - Scroll to the bottom of the workflow run page
+   - In the "Artifacts" section, click on `dbt-target` to download
+   - Extract the downloaded zip file
+
+4. **View the docs**
+   ```bash
+   # Navigate to the extracted directory
+   cd path/to/extracted/dbt-target
+   
+   # Start a simple HTTP server
+   python3 -m http.server 8080
+   
+   # Open in browser
+   open http://localhost:8080/index.html  # macOS
+   # or just navigate to http://localhost:8080/index.html
+   ```
+
+5. **Stop the server** when done: Press `Ctrl+C`
+
+### Troubleshooting
+
+**Script fails with "gh auth status" error:**
+- Run `gh auth login` and follow the prompts to authenticate
+
+**"No completed workflow runs found":**
+- Check that the PR has at least one successful CI run
+- The script looks for completed runs only (not in-progress or failed)
+
+**"Port 8080 already in use":**
+- Use a different port: `python scripts/view_docs.py 5 --port 8081`
+- Or find and kill the process using port 8080
+
+**Artifact not found:**
+- Check that the workflow has "Upload dbt target artifacts" step
+- Artifacts expire after 7 days (configurable in `.github/workflows/ci.yml`)
+
+### What to Look For in the Docs
+
+When reviewing the dbt docs, check:
+- **DAG (Lineage)**: Clear flow from staging → marts
+- **Model Descriptions**: All models and columns documented
+- **Tests**: Visible in the UI, especially custom tests
+- **Schema**: Proper data types and naming conventions
+- **Sources**: Seeds properly defined as sources (if they did that)
+
+---
