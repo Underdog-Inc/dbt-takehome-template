@@ -1,8 +1,28 @@
 # dbt Take‑Home Assessment
 
-Welcome! This repository contains a self‑contained dbt project scaffold and a small dataset for a practical analytics engineering exercise. You’ll model data, add tests, document your work, and run everything locally using **DuckDB**—no cloud creds required.
+Welcome! This repository contains a self‑contained dbt project scaffold and a small dataset for a practical analytics engineering exercise. You'll model data, add tests, document your work, and run everything locally using **DuckDB**—no cloud creds required.
 
 > **Timebox:** We expect ~2–3 hours. Focus on clarity of thinking, data modeling choices, and test coverage—not boilerplate.
+
+---
+
+## 🚀 Getting Started: Create Your Private Repository
+
+**Before you begin working on the assessment, please create your own private repository from this template:**
+
+1. **Click the "Use this template" button** at the top of this repository page (or visit the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template))
+2. Select **"Create a new repository"**
+3. Choose a repository name (e.g., `dbt-takehome-yourname`)
+4. **Set visibility to Private** ⚠️
+5. Click **"Create repository"**
+6. Clone your new private repository to your local machine:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+   cd YOUR-REPO-NAME
+   ```
+7. **Grant access to reviewers** as specified in [`TASK.md`](./TASK.md)
+
+Now you're ready to start the assessment! 🎉
 
 ---
 
