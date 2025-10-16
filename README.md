@@ -9,6 +9,7 @@ Welcome! This repository contains a self‑contained dbt project scaffold and a 
 ## 🧭 Contents
 - [`TASK.md`](./TASK.md): The full prompt, deliverables, and rubric
 - [`seeds/`](./seeds): Small CSVs you’ll load with `dbt seed`
+  - [`seeds/DATA_SUMMARY.md`](./seeds/DATA_SUMMARY.md): Descriptions and key information to be aware of about the data.
 - [`models/`](./models): Start in `staging/` then build to `marts/`
 - [`macros/`](./macros): Add at least one macro (Jinja)
 - [`profiles/`](./profiles): A working DuckDB profile (no external creds)
