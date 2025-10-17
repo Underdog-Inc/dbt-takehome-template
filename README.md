@@ -116,13 +116,13 @@ dbt docs generate
 ```
 
 ### Option 2: Direct CSV Queries
-Query CSV files directly without seeding:
+Query CSV files directly without seeding using `uvx duckdb`:
 ```bash
 # Single query
-duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
+uvx duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
 
 # Join multiple CSVs
-duckdb -c "
+uvx duckdb -c "
   SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
   FROM 'seeds/users.csv' u
   LEFT JOIN 'seeds/entries.csv' e ON u.user_id = e.user_id
@@ -131,10 +131,12 @@ duckdb -c "
 "
 ```
 
+> **Note:** `uvx duckdb` automatically installs the DuckDB CLI on first use—no separate installation needed!
+
 ### Option 3: Interactive DuckDB CLI
 ```bash
 # Open the seeded database
-duckdb ./.dbt/dbt_duckdb.duckdb
+uvx duckdb ./.dbt/dbt_duckdb.duckdb
 
 # Inside DuckDB CLI:
 .tables              # list all tables
@@ -179,10 +181,7 @@ SELECT * FROM main.users LIMIT 5;
   You'll need to run this in each new terminal session, or add it to your shell profile.
 * **Fresh build**: Try `dbt clean && dbt deps && dbt seed && dbt build --full-refresh`.
 * **DuckDB file**: The database file lives at `./.dbt/dbt_duckdb.duckdb`.
-* **DuckDB CLI not found**: The setup scripts attempt to install DuckDB CLI automatically. If installation fails, install manually:
-  - **macOS**: `brew install duckdb`
-  - **Linux**: Download from [DuckDB releases](https://github.com/duckdb/duckdb/releases)
-  - **Windows**: Download from [DuckDB releases](https://github.com/duckdb/duckdb/releases) and add to PATH
+* **DuckDB CLI**: Use `uvx duckdb` to run DuckDB CLI commands. The first time you run it, `uvx` will automatically install DuckDB.
 
 ## Submission
 Open an Issue on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` with:
