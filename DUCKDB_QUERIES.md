@@ -49,10 +49,10 @@ sources:
       external: true
     
     tables:
-      - name: users
+      - name: entries
         description: User accounts and KYC information
         meta:
-          external_location: "read_parquet('source_data/users.parquet')"
+          external_location: "read_parquet('source_data/entries.parquet')"
 ```
 
 Then use in your models:
