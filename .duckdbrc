@@ -1,0 +1,19 @@
+-- DuckDB Configuration File
+-- This file is automatically loaded when starting DuckDB CLI
+
+-- Set output mode to something readable
+.mode markdown
+
+-- Enable progress bar for long queries
+.progress on
+
+-- Set null value display
+.nullvalue NULL
+
+-- Show helpful welcome message
+.print
+.print "🦆 Welcome to DuckDB!"
+.print "Tip: Use .tables to list tables, .schema <table> to see structure"
+.print "Tip: Run .mode csv or .mode markdown to change output format"
+.print "Tip: See DUCKDB_QUERIES.md for example queries"
+.print
