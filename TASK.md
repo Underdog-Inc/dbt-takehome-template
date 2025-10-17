@@ -60,7 +60,16 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
      - `fct_deposits_overview` — Deposit success rates by payment method, average amounts, admin vs user deposits
      - `fct_withdrawals_overview` — Withdrawal completion rates, failure analysis
      - **Top 10 states by net gaming revenue** with tie‑breakers (document your rule).
-   - Implement an **incremental** strategy for at least one marts model (idempotent). Document your choice of unique key, time grain, and strategy.
+   - Create an incremental (idempotent) model that tracks the following metrics for each day of a user's lifetime
+     - Metrics
+       - Total cash entry fees paid in the last 7 days
+       - Total cash entry fees paid life to date
+       - Total bonus entry fees used in the last 7 days
+       - Total bonus entry fees used life to date
+       - Net gaming revenue in the last 7 days
+       - Net gaming revenue life to date
+     - You can use the first user - daily model you created, if helpful
+     - Explain your choice of unique key, time grain, and incremental strategy.
    - **Bonus:** Build a weekly grain model with weeks starting on Tuesday to align with the NFL calendar. Consider creating a macro for this date logic.
 2. **Testing**
    - Add **column tests** (e.g., `unique`, `not_null`) for key fields.
@@ -79,7 +88,6 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
 - Tests in `models/tests/` or in model YAML
 - Macro(s) in `macros/`
 - Documentation (model/column descriptions)
-- Incremental config on at least one marts model
 - All CI checks (if configured) passing
 
 ## Timebox
