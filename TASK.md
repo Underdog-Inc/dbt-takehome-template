@@ -69,7 +69,7 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
        - Net gaming revenue in the last 7 days
        - Net gaming revenue life to date
      - You can use the first user - daily model you created, if helpful
-     - Document your choice of unique key, time grain, and incremental strategy.
+     - Explain your choice of unique key, time grain, and incremental strategy.
    - **Bonus:** Build a weekly grain model with weeks starting on Tuesday to align with the NFL calendar. Consider creating a macro for this date logic.
 2. **Testing**
    - Add **column tests** (e.g., `unique`, `not_null`) for key fields.
