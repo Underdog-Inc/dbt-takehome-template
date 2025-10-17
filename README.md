@@ -28,13 +28,14 @@ Now you're ready to start the assessment! 🎉
 
 ## 🧭 Contents
 - [`TASK.md`](./TASK.md): The full prompt, deliverables, and rubric
-- [`seeds/`](./seeds): Small CSVs you’ll load with `dbt seed`
+- [`seeds/`](./seeds): Small CSVs you'll load with `dbt seed`
   - [`seeds/DATA_SUMMARY.md`](./seeds/DATA_SUMMARY.md): Descriptions and key information to be aware of about the data.
 - [`models/`](./models): Start in `staging/` then build to `marts/`
 - [`macros/`](./macros): Add at least one macro (Jinja)
 - [`profiles/`](./profiles): A working DuckDB profile (no external creds)
 - [`pyproject.toml`](./pyproject.toml): Project dependencies (managed by **uv**)
 - [`scripts/setup.sh`](./scripts/setup.sh) and [`scripts/setup.ps1`](./scripts/setup.ps1): One‑command setup with **uv**
+- [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md): Example queries and DuckDB reference guide
 
 ---
 
@@ -98,6 +99,54 @@ dbt docs generate  # regenerate docs site
 
 ---
 
+## 🦆 Querying Data with DuckDB
+
+You have multiple ways to explore the CSV data:
+
+### Option 1: Through dbt (Recommended)
+```bash
+# Load CSVs into DuckDB as tables
+dbt seed
+
+# Query via dbt models
+dbt run
+
+# View results in generated docs
+dbt docs generate
+```
+
+### Option 2: Direct CSV Queries
+Query CSV files directly without seeding:
+```bash
+# Single query
+duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
+
+# Join multiple CSVs
+duckdb -c "
+  SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
+  FROM 'seeds/users.csv' u
+  LEFT JOIN 'seeds/entries.csv' e ON u.user_id = e.user_id
+  GROUP BY u.user_id, u.state
+  LIMIT 10;
+"
+```
+
+### Option 3: Interactive DuckDB CLI
+```bash
+# Open the seeded database
+duckdb ./.dbt/dbt_duckdb.duckdb
+
+# Inside DuckDB CLI:
+.tables              # list all tables
+.schema users        # show table schema
+SELECT * FROM main.users LIMIT 5;
+.quit                # exit
+```
+
+**📖 For more query examples, see [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md)**
+
+---
+
 ## 🗂️ Suggested Project Structure
 ```
 .
@@ -130,6 +179,10 @@ dbt docs generate  # regenerate docs site
   You'll need to run this in each new terminal session, or add it to your shell profile.
 * **Fresh build**: Try `dbt clean && dbt deps && dbt seed && dbt build --full-refresh`.
 * **DuckDB file**: The database file lives at `./.dbt/dbt_duckdb.duckdb`.
+* **DuckDB CLI not found**: The setup scripts attempt to install DuckDB CLI automatically. If installation fails, install manually:
+  - **macOS**: `brew install duckdb`
+  - **Linux**: Download from [DuckDB releases](https://github.com/duckdb/duckdb/releases)
+  - **Windows**: Download from [DuckDB releases](https://github.com/duckdb/duckdb/releases) and add to PATH
 
 ## Submission
 Open an Issue titled `Submission: <Your Name>` with:
