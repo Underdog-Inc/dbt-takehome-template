@@ -60,7 +60,7 @@ dbt seed --show
 dbt build
 
 # 6) Explore docs locally (from the ./target site)
-python -m http.server 8000 -d target && open http://localhost:8000/index.html
+dbt docs generate && dbt docs serve
 ```
 
 ## ⚙️ Quick Start (Windows PowerShell)
@@ -103,7 +103,7 @@ dbt docs generate  # regenerate docs site
 
 You have multiple ways to explore the CSV data:
 
-### Option 1: Through dbt (Recommended)
+### Option 1: Through dbt
 ```bash
 # Load CSVs into DuckDB as tables
 dbt seed
@@ -185,7 +185,7 @@ SELECT * FROM main.users LIMIT 5;
   - **Windows**: Download from [DuckDB releases](https://github.com/duckdb/duckdb/releases) and add to PATH
 
 ## Submission
-Open an Issue titled `Submission: <Your Name>` with:
+Open an Issue on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` with:
 * Link to your private repo (grant access to reviewers listed in the prompt)
 * Approx. time spent & assumptions
 * Anything you’d do with more time

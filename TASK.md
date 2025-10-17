@@ -89,8 +89,8 @@ Aim for **2–3 hours**. If you decide not to implement something, explain the t
 - Test for both data quality and business logic
 
 ## Submission
-Open an Issue titled `Submission: <Your Name>` and include:
-- Repo URL (grant access to reviewers: `@eamon-underdog`| eamon.glackin@underdogfantasy.com and team)
+Open an Issue on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` and include:
+- Repo URL (grant access to reviewers:`@eamon-underdog`, `@kimjam`, `@bagpipes1323`)
 - Approx. time spent
 - Assumptions & edge cases
 - Any deviations from requirements with rationale
