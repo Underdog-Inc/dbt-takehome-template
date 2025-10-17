@@ -1,25 +1,30 @@
 # TASK — Analytics Engineer dbt Take‑Home
 
 ## Scenario
-You're joining the analytics engineering team at Underdog Fantasy, a daily fantasy sports platform. You will model core business entities from the provided raw CSVs — users, contests, entries, and financial transactions — then surface key metrics and insights for analysis.
+You're joining the analytics engineering team at Underdog Fantasy, a daily fantasy sports platform. You will model core business entities from the provided raw Parquet sources — users, contests, entries, and financial transactions — then surface key metrics and insights for analysis.
 
 ## Data
-You have five CSV seeds (`seeds/`):
-- **users.csv** — one row per user (user_id, created_at, state, signup_channel, kyc_status, …)
-- **contests.csv** — one row per fantasy contest (contest_id, contest_type, entry_fee, start_time, status, max_entries, …)
-- **entries.csv** — one row per user entry into a contest (entry_id, user_id, contest_id, entry_time, entry_fee, payout_amount, bonus_funds_used, cash_used, …)
-- **deposits.csv** — one row per user deposit (deposit_id, user_id, deposit_ts, amount, payment_method, status, is_admin_deposit)
-- **withdrawals.csv** — one row per user withdrawal (withdrawal_id, user_id, withdrawal_ts, amount, status)
+You have five Parquet source files (`source_data/`):
+- **users.parquet** — one row per user (user_id [UUID], created_at, state, signup_channel, kyc_status)
+- **contests.parquet** — one row per fantasy contest (contest_id [UUID], contest_type, entry_fee, start_time, status, max_entries, prize_pool)
+- **entries.parquet** — one row per user entry into a contest (entry_id [UUID], user_id, contest_id, entry_time, entry_fee, payout_amount, bonus_funds_used, cash_used, status)
+- **deposits.parquet** — one row per user deposit (deposit_id [UUID], user_id, deposit_ts, amount, payment_method, status, is_admin_deposit)
+- **withdrawals.parquet** — one row per user withdrawal (withdrawal_id [UUID], user_id, withdrawal_ts, amount, status)
+
+**Setting up sources:** You'll need to configure these Parquet files as dbt sources. See [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md) for an example source configuration.
 
 Assume:
+- **All IDs are UUIDs** (e.g., `f4a06ec5-a762-459b-9413-8fc28b08d505`) for realistic production-like data
+- **KYC Requirements**: Only users with `kyc_status = 'verified'` can make deposits, withdrawals, or enter contests. Only verified users have state information.
 - Contests in `status IN ('completed', 'cancelled')` are final
 - Entries are linked to completed contests for payout calculations
 - Financial transactions in `status = 'completed'` are settled
 - All amounts are in USD
 - **Bonus funds**: Admin deposits (`is_admin_deposit = TRUE`) credit promotional funds to users. When entering contests, bonus funds are consumed first before user cash. **Only cash entry fees (`cash_used`) count toward net gaming revenue**, not total `entry_fee`.
 - **Data quality**: Some records may have NULLs or missing values that need cleaning in staging.
+- **Dataset size**: 40,000 users, 4,000 contests, 600,000 entries, 64,000 deposits, 16,000 withdrawals
 
-> Data volume includes thousands of records to simulate realistic scenarios. See `seeds/DATA_SUMMARY.md` for detailed information.
+> Data volume includes thousands of records to simulate realistic scenarios. See `source_data/DATA_SUMMARY.md` for detailed information.
 
 ## Key Business Concepts
 
@@ -40,8 +45,9 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
 
 ## Requirements
 1. **Modeling**
-   - Create **staging** models that clean and type‑cast the seeds. Handle NULLs, missing values, and data quality issues. See `models/staging/stg_entries_example.sql` for a reference pattern.
-   - Build a **user-level marts model** at a time grain of your choice (daily, weekly, or monthly) with key metrics per user:
+   - Set up **dbt sources** for the Parquet files (create `models/staging/_sources.yml`). Reference them using `{{ source('source_name', 'table_name') }}` in your models.
+   - Create **staging** models that clean and type‑cast the sources. Handle NULLs, missing values, and data quality issues. See `models/staging/stg_entries_example.sql` for a reference pattern.
+   - Build a **user-level marts model** at a daily grain with key metrics per user:
      - Total cash entry fees paid (`cash_used`)
      - Total bonus entry fees used (`bonus_funds_used`)
      - Total payouts won
@@ -80,7 +86,8 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
 Aim for **2–3 hours**. If you decide not to implement something, explain the trade‑off in your repo README or in comments.
 
 ## Tips for Success
-- Read `seeds/DATA_SUMMARY.md` to understand the bonus funds logic
+- Read `source_data/DATA_SUMMARY.md` to understand the bonus funds logic and data structure
+- See `DUCKDB_QUERIES.md` for examples of setting up dbt sources with Parquet files
 - Remember: `cash_used` ≠ `entry_fee` (this matters for revenue!)
 - Handle data quality issues in staging (use COALESCE, NULLIF, etc.)
 - Filter to `status = 'completed'` for financial calculations

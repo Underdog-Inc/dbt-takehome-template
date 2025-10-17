@@ -4,50 +4,94 @@ This guide provides examples for querying the Fantasy Sports data using DuckDB.
 
 ## Quick Start
 
-### Query CSV files directly (no seeding required)
-Use `uvx duckdb` to run SQL queries directly against CSV files:
+Use `uvx` to run DuckDB queries directly without any setup:
+
+### Query Parquet files directly
 ```bash
 # Count users by state
-uvx duckdb -c "
-  SELECT state, COUNT(*) as user_count
-  FROM 'seeds/users.csv'
-  GROUP BY state
-  ORDER BY user_count DESC
-  LIMIT 10;
-"
+uvx duckdb -c "SELECT state, COUNT(*) as user_count 
+  FROM 'source_data/users.parquet' 
+  WHERE state IS NOT NULL 
+  GROUP BY state 
+  ORDER BY user_count DESC 
+  LIMIT 10"
 ```
 
-> **Note:** `uvx duckdb` automatically installs the DuckDB CLI on first use—no separate installation needed!
-
-### Use the interactive DuckDB CLI
+### Query your dbt database
 ```bash
-# Open the seeded database
-uvx duckdb ./.dbt/dbt_duckdb.duckdb
+# View all tables in your dbt database (after running dbt run)
+uvx duckdb ./.dbt/dbt_duckdb.duckdb -c "SHOW TABLES"
 
-# Or query CSV files directly in one-liner mode
-uvx duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
+# Query a specific model
+uvx duckdb ./.dbt/dbt_duckdb.duckdb -c "SELECT * FROM stg_users LIMIT 10"
+```
+
+### Interactive DuckDB CLI
+```bash
+# Open interactive session with Parquet files
+uvx duckdb
+
+# Or open your dbt database interactively
+uvx duckdb ./.dbt/dbt_duckdb.duckdb
+```
+
+## Setting Up dbt Sources
+
+To use these Parquet files as sources in dbt, create a `_sources.yml` file in `models/staging/`:
+
+```yaml
+version: 2
+
+sources:
+  - name: raw_data
+    description: Raw Parquet source files
+    meta:
+      external: true
+    
+    tables:
+      - name: users
+        description: User accounts and KYC information
+        meta:
+          external_location: "read_parquet('source_data/users.parquet')"
+```
+
+Then use in your models:
+
+```sql
+-- models/staging/stg_users.sql
+select * from {{ source('raw_data', 'users') }}
 ```
 
 ## Common Query Examples
 
-All examples below can be run with `uvx duckdb -c "..."` or in the interactive CLI (`uvx duckdb ./.dbt/dbt_duckdb.duckdb`).
+All examples below can be run with `uvx duckdb -c "YOUR_QUERY"` or in the interactive CLI.
 
 ### User Analysis
 ```sql
 -- Users by signup channel
 SELECT signup_channel, COUNT(*) as users, 
        ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 2) as pct
-FROM 'seeds/users.csv'
-GROUP BY signup_channel;
+FROM 'source_data/users.parquet'
+WHERE signup_channel IS NOT NULL AND signup_channel != ''
+GROUP BY signup_channel
+ORDER BY users DESC;
 
--- KYC completion rate by state
+-- KYC status breakdown (important: only verified users can transact!)
+SELECT kyc_status,
+       COUNT(*) as user_count,
+       ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (), 1) as pct,
+       SUM(CASE WHEN state IS NOT NULL AND state != '' THEN 1 ELSE 0 END) as users_with_state
+FROM 'source_data/users.parquet'
+GROUP BY kyc_status
+ORDER BY user_count DESC;
+
+-- Top 10 states by verified user count
 SELECT state,
-       COUNT(*) as total_users,
-       SUM(CASE WHEN kyc_status = 'verified' THEN 1 ELSE 0 END) as verified,
-       ROUND(100.0 * SUM(CASE WHEN kyc_status = 'verified' THEN 1 ELSE 0 END) / COUNT(*), 2) as verification_rate
-FROM 'seeds/users.csv'
+       COUNT(*) as verified_users
+FROM 'source_data/users.parquet'
+WHERE state IS NOT NULL AND state != '' AND kyc_status = 'verified'
 GROUP BY state
-ORDER BY total_users DESC
+ORDER BY verified_users DESC
 LIMIT 10;
 ```
 
@@ -58,7 +102,7 @@ SELECT contest_type,
        COUNT(*) as contest_count,
        AVG(entry_fee) as avg_entry_fee,
        SUM(max_entries) as total_capacity
-FROM 'seeds/contests.csv'
+FROM 'source_data/contests.parquet'
 WHERE status = 'completed'
 GROUP BY contest_type;
 ```
@@ -66,35 +110,34 @@ GROUP BY contest_type;
 ## DuckDB Tips
 
 ### Performance
-```sql
--- Use LIMIT for exploration
-SELECT * FROM 'seeds/entries.csv' LIMIT 100;
+```bash
+# Use LIMIT for exploration
+uvx duckdb -c "SELECT * FROM 'source_data/entries.parquet' LIMIT 100"
 
--- Count rows quickly
-SELECT COUNT(*) FROM 'seeds/users.csv';
+# Count rows quickly
+uvx duckdb -c "SELECT COUNT(*) FROM 'source_data/users.parquet'"
 
--- Profile query performance
-EXPLAIN SELECT * FROM 'seeds/entries.csv';
+# Profile query performance
+uvx duckdb -c "EXPLAIN SELECT * FROM 'source_data/entries.parquet'"
 ```
 
 ### Data Quality Checks
-```sql
--- Check for NULLs
-SELECT 
+```bash
+# Check for NULLs
+uvx duckdb -c "SELECT 
     COUNT(*) as total_rows,
     SUM(CASE WHEN state IS NULL THEN 1 ELSE 0 END) as null_states
-FROM 'seeds/users.csv';
-
+FROM 'source_data/users.parquet'"
 ```
 
 ### Export Results
-```sql
--- Export to CSV
-COPY (
+```bash
+# Export to CSV
+uvx duckdb -c "COPY (
     SELECT state, COUNT(*) as user_count
-    FROM 'seeds/users.csv'
+    FROM 'source_data/users.parquet'
     GROUP BY state
-) TO 'output/users_by_state.csv' WITH (HEADER TRUE, DELIMITER ',');
+) TO 'output/users_by_state.csv' WITH (HEADER TRUE, DELIMITER ',')"
 ```
 
 ## Interactive CLI Commands
