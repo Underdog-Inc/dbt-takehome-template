@@ -7,3 +7,6 @@ profiles/*
 !profiles/profiles.example.yml
 src/dbt_takehome.egg-info/
 target/
+output/
+*.duckdb
+*.duckdb.wal
