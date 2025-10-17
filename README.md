@@ -112,14 +112,24 @@ dbt run
 dbt docs generate
 ```
 
-### Option 2: Direct Parquet Queries with uvx
-Query Parquet files directly using DuckDB:
+### Option 2: Direct Parquet Queries with DuckDB CLI
+Query Parquet files directly using DuckDB (requires separate installation):
+
+**Install DuckDB CLI:**
+```bash
+# macOS
+brew install duckdb
+
+# Or download from https://duckdb.org/docs/installation/
+```
+
+**Query examples:**
 ```bash
 # Single query
-uvx duckdb -c "SELECT * FROM 'source_data/users.parquet' LIMIT 10"
+duckdb -c "SELECT * FROM 'source_data/users.parquet' LIMIT 10"
 
 # Join multiple Parquet files
-uvx duckdb -c "SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
+duckdb -c "SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
   FROM 'source_data/users.parquet' u
   LEFT JOIN 'source_data/entries.parquet' e ON u.user_id = e.user_id
   GROUP BY u.user_id, u.state
@@ -129,10 +139,10 @@ uvx duckdb -c "SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
 ### Option 3: Interactive DuckDB CLI
 ```bash
 # Query Parquet files interactively
-uvx duckdb
+duckdb
 
 # Or query your dbt database (after running dbt run)
-uvx duckdb ./.dbt/dbt_duckdb.duckdb
+duckdb ./.dbt/dbt_duckdb.duckdb
 ```
 
 **📖 For more query examples, see [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md)**
