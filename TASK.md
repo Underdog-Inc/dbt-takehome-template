@@ -88,7 +88,6 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
 - Tests in `models/tests/` or in model YAML
 - Macro(s) in `macros/`
 - Documentation (model/column descriptions)
-- Incremental config on at least one marts model
 - All CI checks (if configured) passing
 
 ## Timebox
