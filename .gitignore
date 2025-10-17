@@ -1,0 +1,9 @@
+.dbt/
+dbt_packages/
+logs/
+package-lock.yml
+profiles/*
+!profiles/
+!profiles/profiles.example.yml
+src/dbt_takehome.egg-info/
+target/
