@@ -28,14 +28,14 @@ Now you're ready to start the assessment! 🎉
 
 ## 🧭 Contents
 - [`TASK.md`](./TASK.md): The full prompt, deliverables, and rubric
-- [`seeds/`](./seeds): Small CSVs you'll load with `dbt seed`
-  - [`seeds/DATA_SUMMARY.md`](./seeds/DATA_SUMMARY.md): Descriptions and key information to be aware of about the data.
+- [`source_data/`](./source_data): **Parquet source data files** (efficient storage, fast queries)
+  - [`source_data/DATA_SUMMARY.md`](./source_data/DATA_SUMMARY.md): Comprehensive data documentation and schema details
 - [`models/`](./models): Start in `staging/` then build to `marts/`
 - [`macros/`](./macros): Add at least one macro (Jinja)
 - [`profiles/`](./profiles): A working DuckDB profile (no external creds)
 - [`pyproject.toml`](./pyproject.toml): Project dependencies (managed by **uv**)
 - [`scripts/setup.sh`](./scripts/setup.sh) and [`scripts/setup.ps1`](./scripts/setup.ps1): One‑command setup with **uv**
-- [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md): Example queries and DuckDB reference guide
+- [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md): Example queries and source configuration guide
 
 ---
 
@@ -51,10 +51,9 @@ source .venv/bin/activate
 # 3) Set the profiles directory (so dbt finds profiles/profiles.yml)
 export DBT_PROFILES_DIR="$PWD/profiles"
 
-# 4) Verify dbt & seed the data
+# 4) Verify dbt and install dependencies
 dbt --version
 dbt deps
-dbt seed --show
 
 # 5) Build (models + tests + docs)
 dbt build
@@ -78,7 +77,6 @@ $env:DBT_PROFILES_DIR = "$PWD\profiles"
 uv pip list
 uv run dbt --version
 uv run dbt deps
-uv run dbt seed --show
 uv run dbt build
 ```
 > If uv run is used, you don't need to manually activate .venv. Both approaches work.
@@ -90,7 +88,6 @@ uv run dbt build
 ## 🧪 Common dbt Commands
 ```
 dbt deps
-dbt seed
 dbt run
 dbt test
 dbt build          # run + test + docs
@@ -101,12 +98,12 @@ dbt docs generate  # regenerate docs site
 
 ## 🦆 Querying Data with DuckDB
 
-You have multiple ways to explore the CSV data:
+You have multiple ways to explore the Parquet source data:
 
 ### Option 1: Through dbt
 ```bash
-# Load CSVs into DuckDB as tables
-dbt seed
+# Set up sources (see DUCKDB_QUERIES.md for examples)
+# Create models/staging/_sources.yml
 
 # Query via dbt models
 dbt run
@@ -115,34 +112,27 @@ dbt run
 dbt docs generate
 ```
 
-### Option 2: Direct CSV Queries
-Query CSV files directly without seeding using `uvx duckdb`:
+### Option 2: Direct Parquet Queries with uvx
+Query Parquet files directly using DuckDB:
 ```bash
 # Single query
-uvx duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
+uvx duckdb -c "SELECT * FROM 'source_data/users.parquet' LIMIT 10"
 
-# Join multiple CSVs
-uvx duckdb -c "
-  SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
-  FROM 'seeds/users.csv' u
-  LEFT JOIN 'seeds/entries.csv' e ON u.user_id = e.user_id
+# Join multiple Parquet files
+uvx duckdb -c "SELECT u.user_id, u.state, COUNT(e.entry_id) as total_entries
+  FROM 'source_data/users.parquet' u
+  LEFT JOIN 'source_data/entries.parquet' e ON u.user_id = e.user_id
   GROUP BY u.user_id, u.state
-  LIMIT 10;
-"
+  LIMIT 10"
 ```
-
-> **Note:** `uvx duckdb` automatically installs the DuckDB CLI on first use—no separate installation needed!
 
 ### Option 3: Interactive DuckDB CLI
 ```bash
-# Open the seeded database
-uvx duckdb ./.dbt/dbt_duckdb.duckdb
+# Query Parquet files interactively
+uvx duckdb
 
-# Inside DuckDB CLI:
-.tables              # list all tables
-.schema users        # show table schema
-SELECT * FROM main.users LIMIT 5;
-.quit                # exit
+# Or query your dbt database (after running dbt run)
+uvx duckdb ./.dbt/dbt_duckdb.duckdb
 ```
 
 **📖 For more query examples, see [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md)**
@@ -179,9 +169,9 @@ SELECT * FROM main.users LIMIT 5;
   export DBT_PROFILES_DIR="$PWD/profiles"
   ```
   You'll need to run this in each new terminal session, or add it to your shell profile.
-* **Fresh build**: Try `dbt clean && dbt deps && dbt seed && dbt build --full-refresh`.
+* **Fresh build**: Try `dbt clean && dbt deps && dbt build --full-refresh`.
 * **DuckDB file**: The database file lives at `./.dbt/dbt_duckdb.duckdb`.
-* **DuckDB CLI**: Use `uvx duckdb` to run DuckDB CLI commands. The first time you run it, `uvx` will automatically install DuckDB.
+* **Source data**: The Parquet files are in `source_data/`. See [`DUCKDB_QUERIES.md`](./DUCKDB_QUERIES.md) for examples of setting up sources.
 
 ## Submission
 Open an Issue on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` with:

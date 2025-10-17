@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: raw_data
+    description: Raw Parquet source files
+    meta:
+      external: true
+    
+    tables:
+      - name: entries
+        description: User accounts and KYC information
+        meta:
+          external_location: "read_parquet('source_data/entries.parquet')"

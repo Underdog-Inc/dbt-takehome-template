@@ -2,7 +2,7 @@
 -- This demonstrates handling data quality issues and type casting
 
 with source as (
-    select * from {{ ref('entries') }}
+    select * from {{ source('raw_data', 'entries') }}
 ),
 
 cleaned as (
