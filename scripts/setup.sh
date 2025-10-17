@@ -32,11 +32,29 @@ export DBT_PROFILES_DIR="$PWD/profiles"
 mkdir -p .dbt
 cp -n profiles/profiles.example.yml profiles/profiles.yml 2>/dev/null || true
 
-echo "\n ✅ Setup complete."
-echo "\nTo use dbt, set the profiles directory in your current shell:"
+# Install DuckDB CLI if missing
+if ! command -v duckdb >/dev/null 2>&1; then
+  echo "Installing DuckDB CLI..."
+  if command -v brew >/dev/null 2>&1; then
+    brew install duckdb
+  else
+    echo "⚠️  Homebrew not found. Skipping DuckDB CLI installation."
+    echo "   You can install it manually from: https://duckdb.org/docs/installation/"
+  fi
+fi
+
+echo ""
+echo "✅ Setup complete."
+echo "To activate the virtual environment:"
+echo "  source .venv/bin/activate"
+echo "To use dbt, set the profiles directory in your current shell:"
 echo "  export DBT_PROFILES_DIR=\"\$PWD/profiles\""
-echo "\nOr source this script to keep the environment:"
-echo "  source ./scripts/setup.sh"
-echo "\nThen run: dbt deps && dbt seed --show && dbt build"
-echo "\n💡 You can also query CSV files directly with DuckDB CLI (via uvx):"
-echo "  uvx duckdb -c \"SELECT * FROM 'seeds/users.csv' LIMIT 5;\""
+echo "Then run: dbt deps && dbt build"
+echo ""
+if command -v duckdb >/dev/null 2>&1; then
+  echo "💡 Query Parquet files directly with DuckDB CLI:"
+  echo "  duckdb -c \"SELECT * FROM 'source_data/*.parquet' LIMIT 5;\""
+else
+  echo "💡 To query Parquet files directly, install DuckDB CLI:"
+  echo "  brew install duckdb  # or download from https://duckdb.org/docs/installation/"
+fi
