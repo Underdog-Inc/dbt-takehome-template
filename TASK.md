@@ -52,15 +52,15 @@ The dataset intentionally includes ~1-2% records with missing/NULL values to tes
      - Total bonus entry fees used (`bonus_funds_used`)
      - Total payouts won
      - Net gaming revenue (cash entry fees - payouts)
-     - User cash deposit amount and counts (excluding admin/bonus deposits)
-     - Withdrawal amount and counts
+     - User cash deposits (excluding admin/bonus deposits)
+     - Withdrawals
      - Net balance change
    - **Choose 2-3 additional mart models** from these suggestions or propose your own:
      - `fct_contests` — Contest-level metrics: fill rate (entries/max_entries), total revenue, margin, payout efficiency
      - `fct_deposits_overview` — Deposit success rates by payment method, average amounts, admin vs user deposits
      - `fct_withdrawals_overview` — Withdrawal completion rates, failure analysis
      - **Top 10 states by net gaming revenue** with tie‑breakers (document your rule).
-   - Create an incremental (idempotent) model that tracks the following metrics for each day of a users life (first deposit date to current day)
+   - Create an incremental (idempotent) model that tracks the following metrics for each day of a user's lifetime
      - Metrics
        - Total cash entry fees paid in the last 7 days
        - Total cash entry fees paid life to date
