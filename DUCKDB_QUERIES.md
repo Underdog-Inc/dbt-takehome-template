@@ -5,25 +5,32 @@ This guide provides examples for querying the Fantasy Sports data using DuckDB.
 ## Quick Start
 
 ### Query CSV files directly (no seeding required)
-```sql
--- Count users by state
-SELECT state, COUNT(*) as user_count
-FROM 'seeds/users.csv'
-GROUP BY state
-ORDER BY user_count DESC
-LIMIT 10;
+Use `uvx duckdb` to run SQL queries directly against CSV files:
+```bash
+# Count users by state
+uvx duckdb -c "
+  SELECT state, COUNT(*) as user_count
+  FROM 'seeds/users.csv'
+  GROUP BY state
+  ORDER BY user_count DESC
+  LIMIT 10;
+"
 ```
+
+> **Note:** `uvx duckdb` automatically installs the DuckDB CLI on first use—no separate installation needed!
 
 ### Use the interactive DuckDB CLI
 ```bash
 # Open the seeded database
-duckdb ./.dbt/dbt_duckdb.duckdb
+uvx duckdb ./.dbt/dbt_duckdb.duckdb
 
-# Or query CSV files directly
-duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
+# Or query CSV files directly in one-liner mode
+uvx duckdb -c "SELECT * FROM 'seeds/users.csv' LIMIT 10;"
 ```
 
 ## Common Query Examples
+
+All examples below can be run with `uvx duckdb -c "..."` or in the interactive CLI (`uvx duckdb ./.dbt/dbt_duckdb.duckdb`).
 
 ### User Analysis
 ```sql
@@ -92,7 +99,7 @@ COPY (
 
 ## Interactive CLI Commands
 
-When in the DuckDB CLI (`duckdb ./.dbt/dbt_duckdb.duckdb`):
+When in the DuckDB CLI (`uvx duckdb ./.dbt/dbt_duckdb.duckdb`):
 
 ```
 .help               -- Show all commands
