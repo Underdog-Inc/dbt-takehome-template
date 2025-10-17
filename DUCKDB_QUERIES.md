@@ -2,14 +2,24 @@
 
 This guide provides examples for querying the Fantasy Sports data using DuckDB.
 
-## Quick Start
+## Installation
 
-Use `uvx` to run DuckDB queries directly without any setup:
+Install the DuckDB CLI to run these queries:
+
+```bash
+# macOS
+brew install duckdb
+
+# Windows / Linux / Other
+# Download from https://duckdb.org/docs/installation/
+```
+
+## Quick Start
 
 ### Query Parquet files directly
 ```bash
 # Count users by state
-uvx duckdb -c "SELECT state, COUNT(*) as user_count 
+duckdb -c "SELECT state, COUNT(*) as user_count 
   FROM 'source_data/users.parquet' 
   WHERE state IS NOT NULL 
   GROUP BY state 
@@ -20,19 +30,19 @@ uvx duckdb -c "SELECT state, COUNT(*) as user_count
 ### Query your dbt database
 ```bash
 # View all tables in your dbt database (after running dbt run)
-uvx duckdb ./.dbt/dbt_duckdb.duckdb -c "SHOW TABLES"
+duckdb ./.dbt/dbt_duckdb.duckdb -c "SHOW TABLES"
 
 # Query a specific model
-uvx duckdb ./.dbt/dbt_duckdb.duckdb -c "SELECT * FROM stg_users LIMIT 10"
+duckdb ./.dbt/dbt_duckdb.duckdb -c "SELECT * FROM stg_users LIMIT 10"
 ```
 
 ### Interactive DuckDB CLI
 ```bash
 # Open interactive session with Parquet files
-uvx duckdb
+duckdb
 
 # Or open your dbt database interactively
-uvx duckdb ./.dbt/dbt_duckdb.duckdb
+duckdb ./.dbt/dbt_duckdb.duckdb
 ```
 
 ## Setting Up dbt Sources
@@ -64,7 +74,7 @@ select * from {{ source('raw_data', 'users') }}
 
 ## Common Query Examples
 
-All examples below can be run with `uvx duckdb -c "YOUR_QUERY"` or in the interactive CLI.
+All examples below can be run with `duckdb -c "YOUR_QUERY"` or in the interactive CLI.
 
 ### User Analysis
 ```sql
@@ -112,19 +122,19 @@ GROUP BY contest_type;
 ### Performance
 ```bash
 # Use LIMIT for exploration
-uvx duckdb -c "SELECT * FROM 'source_data/entries.parquet' LIMIT 100"
+duckdb -c "SELECT * FROM 'source_data/entries.parquet' LIMIT 100"
 
 # Count rows quickly
-uvx duckdb -c "SELECT COUNT(*) FROM 'source_data/users.parquet'"
+duckdb -c "SELECT COUNT(*) FROM 'source_data/users.parquet'"
 
 # Profile query performance
-uvx duckdb -c "EXPLAIN SELECT * FROM 'source_data/entries.parquet'"
+duckdb -c "EXPLAIN SELECT * FROM 'source_data/entries.parquet'"
 ```
 
 ### Data Quality Checks
 ```bash
 # Check for NULLs
-uvx duckdb -c "SELECT 
+duckdb -c "SELECT 
     COUNT(*) as total_rows,
     SUM(CASE WHEN state IS NULL THEN 1 ELSE 0 END) as null_states
 FROM 'source_data/users.parquet'"
@@ -133,7 +143,7 @@ FROM 'source_data/users.parquet'"
 ### Export Results
 ```bash
 # Export to CSV
-uvx duckdb -c "COPY (
+duckdb -c "COPY (
     SELECT state, COUNT(*) as user_count
     FROM 'source_data/users.parquet'
     GROUP BY state
@@ -142,7 +152,7 @@ uvx duckdb -c "COPY (
 
 ## Interactive CLI Commands
 
-When in the DuckDB CLI (`uvx duckdb ./.dbt/dbt_duckdb.duckdb`):
+When in the DuckDB CLI (`duckdb ./.dbt/dbt_duckdb.duckdb`):
 
 ```
 .help               -- Show all commands
