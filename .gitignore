@@ -10,3 +10,4 @@ target/
 output/
 *.duckdb
 *.duckdb.wal
+uv.lock
