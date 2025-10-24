@@ -104,14 +104,18 @@ Aim for **2–3 hours**. If you decide not to implement something, explain the t
 - Test for both data quality and business logic
 
 ## Submission
-Open an Issue on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` and include:
-- Repo URL (grant access to reviewers:`@eamon-underdog`, `@kimjam`, `@bagpipes1323`)
-- Approx. time spent
-- Assumptions & edge cases
-- Any deviations from requirements with rationale
+1. **Create a Pull Request** in your private repository:
+   * Title: `Submission: <Your Name>`
+   * In the PR description, include:
+     - Approx. time spent
+     - Assumptions & edge cases
+     - Any deviations from requirements with rationale
+     - Anything you'd do with more time
+2. **Grant repository access** to reviewers: `@eamon-underdog`, `@kimjam`, `@bagpipes1323`
+3. **Open an Issue** on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` with a link to your PR
 
 ## Rubric (what we look for)
-- **Modeling & structure (30%)** — staging vs marts separation, naming, clarity, handling nuanced busienss context correctly
+- **Modeling & structure (30%)** — staging vs marts separation, naming, clarity, handling nuanced business context correctly
 - **Testing (15%)** — appropriate tests and coverage, data quality tests
 - **Documentation (10%)** — useful descriptions and READMEs
 - **Incremental strategy (5%)** — correctness, idempotence, grain choice & rationale
