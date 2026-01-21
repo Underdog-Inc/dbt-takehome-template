@@ -111,7 +111,7 @@ Aim for **2–3 hours**. If you decide not to implement something, explain the t
      - Assumptions & edge cases
      - Any deviations from requirements with rationale
      - Anything you'd do with more time
-2. **Grant repository access** to reviewers: `@eamon-underdog`, `@kimjam`, `@bagpipes1323`
+2. **Grant repository access** to reviewers: `@eamon-underdog`, `@kimjam`, `@camdenwilleford-ud`
 3. **Open an Issue** on the [template repo](https://github.com/Underdog-Inc/dbt-takehome-template) titled `Submission: <Your Name>` with a link to your PR
 
 ## Rubric (what we look for)
